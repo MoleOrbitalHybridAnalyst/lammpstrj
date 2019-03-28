@@ -23,7 +23,7 @@ class Snap {
    std::unordered_map<std::string, std::vector<double>> field2values;
 
    std::unordered_map<std::string, std::vector<double>>::iterator
-      itx, ity, itz, itvx, itvy, itvz, ittype, itmol, itid;
+      itx, ity, itz, itvx, itvy, itvz, ittype, itmol, itid, itfx, itfy, itfz;
 
    void update_fields2values(std::stringstream&);
 
@@ -55,11 +55,13 @@ public:
    //            std::vector<std::string>& field_names) const;
    VECTOR_NS::Vector<double> get_coord(unsigned iatom) const;
    VECTOR_NS::Vector<double> get_veloc(unsigned iatom) const;
+   VECTOR_NS::Vector<double> get_force(unsigned iatom) const;
    unsigned get_type(unsigned iatom) const;
    unsigned get_mol(unsigned iatom) const;
    unsigned get_id(unsigned iatom) const;
    void set_coord(unsigned iatom, const VECTOR_NS::Vector<double>&);
    void set_veloc(unsigned iatom, const VECTOR_NS::Vector<double>&);
+   void set_force(unsigned iatom, const VECTOR_NS::Vector<double>&);
 
    VECTOR_NS::Vector<double> delta(unsigned i, unsigned j) const
                   { return pbc->delta(get_coord(i), get_coord(j)); }
@@ -115,6 +117,24 @@ VECTOR_NS::Vector<double> Snap::get_veloc(unsigned iatom) const
 #ifndef NDEBUG
    } else {
       throw std::runtime_error("missing vx or vy or vz");
+   }
+#endif
+}
+
+inline
+VECTOR_NS::Vector<double> Snap::get_force(unsigned iatom) const
+{
+#ifndef NDEBUG
+   if(iatom >= natoms) throw std::out_of_range("atom out of range");
+   if(itfx != field2values.end() && 
+      itfy != field2values.end() &&
+      itfz != field2values.end() ) {
+#endif
+      return VECTOR_NS::Vector<double>(
+            itfx->second[iatom], itfy->second[iatom], itfz->second[iatom]);
+#ifndef NDEBUG
+   } else {
+      throw std::runtime_error("missing fx or fy or fz");
    }
 #endif
 }
@@ -200,6 +220,26 @@ void Snap::set_veloc(unsigned iatom,
 #ifndef NDEBUG
    } else {
       throw std::runtime_error("missing vx or vy or vz");
+   }
+#endif
+}
+
+inline
+void Snap::set_force(unsigned iatom,
+      const VECTOR_NS::Vector<double>& v)
+{
+#ifndef NDEBUG
+   if(iatom >= natoms) throw std::out_of_range("atom out of range");
+   if(itfx != field2values.end() && 
+      itfy != field2values.end() &&
+      itfz != field2values.end() ) {
+#endif
+      itfx->second[iatom] = v[0]; 
+      itfy->second[iatom] = v[1];
+      itfz->second[iatom] = v[2];
+#ifndef NDEBUG
+   } else {
+      throw std::runtime_error("missing fx or fy or fz");
    }
 #endif
 }

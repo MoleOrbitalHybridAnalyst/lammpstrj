@@ -65,6 +65,9 @@ pbc(nullptr)
             itvx = field2values.find("vx");
             itvy = field2values.find("vy");
             itvz = field2values.find("vz");
+            itfx = field2values.find("fx");
+            itfy = field2values.find("fy");
+            itfz = field2values.find("fz");
             ittype = field2values.find("type");
             itmol = field2values.find("mol");
             itid = field2values.find("id");
